@@ -91,7 +91,7 @@ def patch_drink(id):
     drink.update()
     return jsonify({
         "success": True,
-        "drinks": [drink]
+        "drinks": [drink.long()]
     }), 200
 
 '''
