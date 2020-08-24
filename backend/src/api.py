@@ -63,7 +63,7 @@ def get_drinks_detail():
 @requires_auth('post:drinks')
 @app.route('/drinks', methods=['POST'])
 def post_drinks():
-    request_drink = request.json()
+    request_drink = request.json
     drink = Drink(title=request_drink['title'], recipe=json.dumps(request_drink['recipe']))
     drink.insert()
     return jsonify({
@@ -86,8 +86,8 @@ def post_drinks():
 @app.route('/drinks/<id>', methods=['PATCH'])
 def patch_drink(id):
     drink = Drink.query.get(id)
-    drink.title = request.json()['title']
-    drink.recipe = json.dumps(request.json()['recipe'])
+    drink.title = request.json['title']
+    drink.recipe = json.dumps(request.json['recipe'])
     drink.update()
     return jsonify({
         "success": True,
