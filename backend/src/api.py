@@ -68,7 +68,7 @@ def post_drinks():
     drink.insert()
     return jsonify({
         "success": True,
-        "drinks": [drink]
+        "drinks": [drink.long()]
     }), 200
 
 '''
