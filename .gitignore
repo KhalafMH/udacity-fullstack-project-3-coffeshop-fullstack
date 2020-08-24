@@ -13,3 +13,5 @@ test.db
 ehthumbs.db
 Thumbs.db
 /.idea/
+
+**/*.iml
