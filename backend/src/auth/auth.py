@@ -1,11 +1,12 @@
 import json
 from flask import request, _request_ctx_stack
 from functools import wraps
-from jose import jwt
+from jose import jwt, JWTError
 from urllib.request import urlopen
 
+from urllib3 import HTTPResponse
 
-AUTH0_DOMAIN = 'udacity-fsnd.auth0.com'
+AUTH0_DOMAIN = 'dev-7vsx8b5f.us.auth0.com'
 ALGORITHMS = ['RS256']
 API_AUDIENCE = 'dev'
 
@@ -31,7 +32,13 @@ class AuthError(Exception):
     return the token part of the header
 '''
 def get_token_auth_header():
-   raise Exception('Not Implemented')
+   header = request.headers.get('Authorization')
+   if header is None:
+       raise AuthError('Authorization header missing')
+   split_header = header.split()
+   if len(split_header) != 2 or split_header[0].lower() != 'bearer':
+       raise AuthError('Malformed Authorization header')
+   return split_header[1]
 
 '''
 @TODO implement check_permissions(permission, payload) method
@@ -45,7 +52,12 @@ def get_token_auth_header():
     return true otherwise
 '''
 def check_permissions(permission, payload):
-    raise Exception('Not Implemented')
+    permissions = payload.get('permissions')
+    if permissions is None:
+        raise AuthError('Permissions missing from payload')
+    if permissions.index(permission) == -1:
+        raise AuthError(f'Payload does not include the {permission} permission')
+    return True
 
 '''
 @TODO implement verify_decode_jwt(token) method
@@ -61,7 +73,18 @@ def check_permissions(permission, payload):
     !!NOTE urlopen has a common certificate error described here: https://stackoverflow.com/questions/50236117/scraping-ssl-certificate-verify-failed-error-for-http-en-wikipedia-org
 '''
 def verify_decode_jwt(token):
-    raise Exception('Not Implemented')
+
+    keys = None
+    with urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json') as response:
+        keys = json.loads(response.read())['keys']
+    for key in keys:
+        try:
+            claims = jwt.decode(token, algorithms=ALGORITHMS, audience=API_AUDIENCE, key=key)
+            return claims
+        except JWTError as e:
+            pass
+    raise AuthError('Invalid token')
+
 
 '''
 @TODO implement @requires_auth(permission) decorator method
