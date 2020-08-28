@@ -86,8 +86,12 @@ def post_drinks(token_payload):
 @requires_auth('patch:drinks')
 def patch_drink(token_payload, id):
     drink = Drink.query.get(id)
-    drink.title = request.json['title']
-    drink.recipe = json.dumps(request.json['recipe'])
+    title = request.json.get('title')
+    if title is not None:
+        drink.title = title
+    recipe = request.json.get('recipe')
+    if recipe is not None:
+        drink.recipe = json.dumps(recipe)
     drink.update()
     return jsonify({
         "success": True,
