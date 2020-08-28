@@ -35,7 +35,7 @@ class AuthTest(unittest.TestCase):
             "permissions": []
         }
         permissions = 'get:drinks-detail'
-        with self.assertRaises(ValueError):
+        with self.assertRaises(AuthError):
             check_permissions(permissions, payload)
 
     def test_check_permissions_succeeds_when_permission_is_included_in_payload(self):
