@@ -86,6 +86,8 @@ def post_drinks(token_payload):
 @requires_auth('patch:drinks')
 def patch_drink(token_payload, id):
     drink = Drink.query.get(id)
+    if drink is None:
+        abort(404)
     title = request.json.get('title')
     if title is not None:
         drink.title = title
@@ -112,6 +114,8 @@ def patch_drink(token_payload, id):
 @requires_auth('delete:drinks')
 def delete_drink(token_payload, id):
     drink = Drink.query.get(id)
+    if drink is None:
+        abort(404)
     drink.delete()
     return jsonify({
         "success": True,
