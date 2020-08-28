@@ -77,7 +77,7 @@ class AuthTest(unittest.TestCase):
             with patch('auth.auth.request', request_mock):
                 @requires_auth('get:drinks-detail')
                 def test_function(token_payload):
-                    if (token_payload['permissions'].index('get:drinks-detail') != -1):
+                    if 'get:drinks-detail' in token_payload['permissions']:
                         return 'passes'
                     else:
                         return 'fails'
@@ -94,7 +94,7 @@ class AuthTest(unittest.TestCase):
             with patch('auth.auth.request', request_mock):
                 @requires_auth('get:drinks-detail')
                 def test_function(token_payload):
-                    if (token_payload['permissions'].index('get:drinks-detail') != -1):
+                    if 'get:drinks-detail' in token_payload['permissions']:
                         return 'passes'
                     else:
                         return 'fails'

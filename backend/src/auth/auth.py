@@ -53,7 +53,7 @@ def check_permissions(permission, payload):
     permissions = payload.get('permissions')
     if permissions is None:
         raise AuthError('Permissions missing from payload', 401)
-    if permissions.index(permission) == -1:
+    if permission not in permissions:
         raise AuthError(f'Payload does not include the {permission} permission', 401)
     return True
 
