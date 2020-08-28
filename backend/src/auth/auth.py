@@ -1,10 +1,8 @@
 import json
-from flask import request, _request_ctx_stack
+from flask import request
 from functools import wraps
 from jose import jwt, JWTError
 from urllib.request import urlopen
-
-from urllib3 import HTTPResponse
 
 AUTH0_DOMAIN = 'dev-7vsx8b5f.us.auth0.com'
 ALGORITHMS = ['RS256']
@@ -34,10 +32,10 @@ class AuthError(Exception):
 def get_token_auth_header():
    header = request.headers.get('Authorization')
    if header is None:
-       raise AuthError('Authorization header missing')
+       raise AuthError('Authorization header missing', 401)
    split_header = header.split()
    if len(split_header) != 2 or split_header[0].lower() != 'bearer':
-       raise AuthError('Malformed Authorization header')
+       raise AuthError('Malformed Authorization header', 401)
    return split_header[1]
 
 '''
@@ -54,9 +52,9 @@ def get_token_auth_header():
 def check_permissions(permission, payload):
     permissions = payload.get('permissions')
     if permissions is None:
-        raise AuthError('Permissions missing from payload')
+        raise AuthError('Permissions missing from payload', 401)
     if permissions.index(permission) == -1:
-        raise AuthError(f'Payload does not include the {permission} permission')
+        raise AuthError(f'Payload does not include the {permission} permission', 401)
     return True
 
 '''
@@ -73,7 +71,6 @@ def check_permissions(permission, payload):
     !!NOTE urlopen has a common certificate error described here: https://stackoverflow.com/questions/50236117/scraping-ssl-certificate-verify-failed-error-for-http-en-wikipedia-org
 '''
 def verify_decode_jwt(token):
-
     keys = None
     with urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json') as response:
         keys = json.loads(response.read())['keys']
@@ -83,7 +80,7 @@ def verify_decode_jwt(token):
             return claims
         except JWTError as e:
             pass
-    raise AuthError('Invalid token')
+    raise AuthError('Invalid token', 401)
 
 
 '''
