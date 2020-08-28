@@ -42,9 +42,9 @@ def get_drinks():
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
-@requires_auth('get:drinks-detail')
 @app.route('/drinks-detail')
-def get_drinks_detail():
+@requires_auth('get:drinks-detail')
+def get_drinks_detail(token_payload):
     drinks = Drink.query.all()
     return jsonify({
         "success": True,
@@ -60,9 +60,9 @@ def get_drinks_detail():
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
-@requires_auth('post:drinks')
 @app.route('/drinks', methods=['POST'])
-def post_drinks():
+@requires_auth('post:drinks')
+def post_drinks(token_payload):
     request_drink = request.json
     drink = Drink(title=request_drink['title'], recipe=json.dumps(request_drink['recipe']))
     drink.insert()
@@ -82,9 +82,9 @@ def post_drinks():
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
         or appropriate status code indicating reason for failure
 '''
-@requires_auth('patch:drinks')
 @app.route('/drinks/<id>', methods=['PATCH'])
-def patch_drink(id):
+@requires_auth('patch:drinks')
+def patch_drink(token_payload, id):
     drink = Drink.query.get(id)
     drink.title = request.json['title']
     drink.recipe = json.dumps(request.json['recipe'])
@@ -104,9 +104,9 @@ def patch_drink(id):
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
-@requires_auth('delete:drinks')
 @app.route('/drinks/<id>', methods=['DELETE'])
-def delete_drink(id):
+@requires_auth('delete:drinks')
+def delete_drink(token_payload, id):
     drink = Drink.query.get(id)
     drink.delete()
     return jsonify({
@@ -158,6 +158,6 @@ def not_found(error):
 def unauthorized(error):
     return jsonify({
         "success": False,
-        "error": 401,
-        "message": "unauthorized"
+        "error": error.status_code,
+        "message": error.error
     }), 401
